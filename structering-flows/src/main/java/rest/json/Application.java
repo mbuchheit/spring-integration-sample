@@ -84,17 +84,68 @@ public class Application {
 					}
 
 				})
+				.channel("TestChannel1")
 				.transform(new JsonToObjectTransformer(User.class))
 				.handle(new GenericHandler<Message>() {
 					@Override
 					public Object handle(Message payload,
 							Map<String, Object> headers) {
-						System.out.println("JSONToObject"
+						System.out.println("XXXXXXXXX"
 								+ payload.getPayload() + " "
 								+ payload.getPayload().getClass());
 						return payload;
 					}
 				}).get();
 	}
+	
+	@Bean
+	public IntegrationFlow testXChannel1() {
+		return IntegrationFlows.from("TestChannel1")
+				.handle(new GenericHandler<Message>() {
+					@Override
+					public Object handle(Message payload,
+							Map<String, Object> headers) {
+						System.out.println("TestChannel1: "
+								+ payload.getPayload() + " "
+								+ payload.getPayload().getClass());
+						return payload;
+					}
+				})
+				.channel("TestChannel2")
+				.get();
+	}
+	
+	@Bean
+	public IntegrationFlow testXChannel2() {
+		return IntegrationFlows.from("TestChannel2")
+				.handle(new GenericHandler<Message>() {
+					@Override
+					public Object handle(Message payload,
+							Map<String, Object> headers) {
+						System.out.println("TestChannel2: "
+								+ payload.getPayload() + " "
+								+ payload.getPayload().getClass());
+						return payload;
+					}
+				})
+				.channel("testXChannel3.input")
+				.get();
+	}
+	
+	@Bean
+	public IntegrationFlow testXChannel3() {
+		return f -> f
+				.handle(new GenericHandler<Message>() {
+					@Override
+					public Object handle(Message payload,
+							Map<String, Object> headers) {
+						System.out.println("testXChannel3: "
+								+ payload.getPayload() + " "
+								+ payload.getPayload().getClass());
+						return payload;
+					}
+				});
+	}
+
 	
 }

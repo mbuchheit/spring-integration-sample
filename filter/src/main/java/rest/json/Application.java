@@ -23,7 +23,6 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.HttpMethod;
 import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.integration.annotation.MessagingGateway;
@@ -33,7 +32,6 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.support.GenericHandler;
 import org.springframework.integration.http.inbound.HttpRequestHandlingMessagingGateway;
 import org.springframework.integration.http.inbound.RequestMapping;
-import org.springframework.integration.json.JsonToObjectTransformer;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 
@@ -84,17 +82,18 @@ public class Application {
 					}
 
 				})
-				.transform(new JsonToObjectTransformer(User.class))
+				.filter("Test"::equals)
 				.handle(new GenericHandler<Message>() {
 					@Override
 					public Object handle(Message payload,
 							Map<String, Object> headers) {
-						System.out.println("JSONToObject"
+						System.out.println("Output must be equal Test: "
 								+ payload.getPayload() + " "
 								+ payload.getPayload().getClass());
 						return payload;
 					}
 				}).get();
 	}
+
 	
 }

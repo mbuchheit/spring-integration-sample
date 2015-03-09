@@ -33,7 +33,6 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.support.GenericHandler;
 import org.springframework.integration.http.inbound.HttpRequestHandlingMessagingGateway;
 import org.springframework.integration.http.inbound.RequestMapping;
-import org.springframework.integration.json.JsonToObjectTransformer;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 
@@ -71,6 +70,7 @@ public class Application {
 	}
 
 	@Bean
+	@DependsOn("errorFlow")
 	public IntegrationFlow flow() {
 		return IntegrationFlows
 				.from("requestChannel")
@@ -84,17 +84,33 @@ public class Application {
 					}
 
 				})
-				.transform(new JsonToObjectTransformer(User.class))
+				.filter(String.class, p -> p.equals("Test"),
+						e -> e.discardChannel("rejected"))
 				.handle(new GenericHandler<Message>() {
 					@Override
 					public Object handle(Message payload,
 							Map<String, Object> headers) {
-						System.out.println("JSONToObject"
+						System.out.println("Payload must be equals Test: "
 								+ payload.getPayload() + " "
 								+ payload.getPayload().getClass());
 						return payload;
 					}
 				}).get();
 	}
-	
+
+	@Bean
+	public IntegrationFlow errorFlow() {
+		return IntegrationFlows.from("rejected")
+				.handle(new GenericHandler<Message>() {
+					@Override
+					public Object handle(Message payload,
+							Map<String, Object> headers) {
+						System.out.println("Rejected flow Payload is: "
+								+ payload.getPayload() + " "
+								+ payload.getPayload().getClass());
+						return payload;
+					}
+				}).get();
+	}
+
 }

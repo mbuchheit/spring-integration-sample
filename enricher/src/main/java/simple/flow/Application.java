@@ -1,4 +1,4 @@
-package rest.json;
+package simple.flow;
 
 /*
  * Copyright 2014 the original author or authors.
@@ -17,13 +17,14 @@ package rest.json;
  */
 
 import java.util.Map;
+import java.util.Date;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.HttpMethod;
 import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.integration.annotation.MessagingGateway;
@@ -33,7 +34,6 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.support.GenericHandler;
 import org.springframework.integration.http.inbound.HttpRequestHandlingMessagingGateway;
 import org.springframework.integration.http.inbound.RequestMapping;
-import org.springframework.integration.json.JsonToObjectTransformer;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 
@@ -44,11 +44,19 @@ import org.springframework.messaging.MessageChannel;
 public class Application {
 
 	public static void main(String[] args) throws Exception {
-		SpringApplication.run(Application.class, args);
+		ConfigurableApplicationContext ctx = SpringApplication.run(
+				Application.class, args);
+		System.out.println(ctx.getBean(Gate.class)
+				.sendReceive("enrichtMessage"));
 	}
 
 	@MessagingGateway(defaultRequestChannel = "requestChannel")
 	public interface Gateway {
+		String sendReceive(String in);
+	}
+
+	@MessagingGateway(defaultRequestChannel = "enrichFlow")
+	public interface Gate {
 		String sendReceive(String in);
 	}
 
@@ -84,17 +92,34 @@ public class Application {
 					}
 
 				})
-				.transform(new JsonToObjectTransformer(User.class))
+				.enrich(e -> e.header("date123", "Enricht Header"))
 				.handle(new GenericHandler<Message>() {
 					@Override
 					public Object handle(Message payload,
 							Map<String, Object> headers) {
-						System.out.println("JSONToObject"
-								+ payload.getPayload() + " "
-								+ payload.getPayload().getClass());
+						System.out.println(payload.getPayload().getClass()
+								+ " " + payload.getPayload());
+						System.out.println("headers.get(date)" +headers.get("date123"));
+						return payload;
+					}
+
+				}).get();
+	}
+
+	@Bean
+	public IntegrationFlow errorFlow() {
+		return IntegrationFlows.from("enrichFlow")
+				.handle(new GenericHandler<Message>() {
+					@Override
+					public Object handle(Message payload,
+							Map<String, Object> headers) {
+						System.out.println(payload.getPayload().getClass()
+								+ " " + payload.getPayload());
 						return payload;
 					}
 				}).get();
 	}
+
 	
+
 }
