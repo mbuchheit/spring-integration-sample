@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="VBankService" targetNamespace="http://vbank.hfu.de/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://vbank.hfu.de/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:types>
+    <schema xmlns="http://www.w3.org/2001/XMLSchema">
+<import namespace="http://vbank.hfu.de/" schemaLocation="vbank_schema1.xsd"/>
+</schema>
+  </wsdl:types>
+  <wsdl:message name="getCreditRate">
+    <wsdl:part name="parameters" element="tns:getCreditRate">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCreditRateResponse">
+    <wsdl:part name="parameters" element="tns:getCreditRateResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="IVBank">
+    <wsdl:operation name="getCreditRate">
+      <wsdl:input name="getCreditRate" message="tns:getCreditRate">
+    </wsdl:input>
+      <wsdl:output name="getCreditRateResponse" message="tns:getCreditRateResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="VBankServiceSoapBinding" type="tns:IVBank">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getCreditRate">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getCreditRate">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getCreditRateResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="VBankService">
+    <wsdl:port name="VBankPort" binding="tns:VBankServiceSoapBinding">
+      <soap:address location="http://localhost:8080/VBankService/services/VBankPort"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
