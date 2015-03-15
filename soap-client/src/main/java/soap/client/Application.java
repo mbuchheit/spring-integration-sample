@@ -32,10 +32,13 @@ import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.dsl.support.Transformers;
 import org.springframework.integration.http.inbound.HttpRequestHandlingMessagingGateway;
 import org.springframework.integration.http.inbound.RequestMapping;
 import org.springframework.integration.ws.DefaultSoapHeaderMapper;
 import org.springframework.integration.ws.SimpleWebServiceOutboundGateway;
+import org.springframework.integration.xml.XmlPayloadConverter;
+import org.springframework.integration.xml.xpath.XPathEvaluationType;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.ws.client.support.destination.Wsdl11DestinationProvider;
 
@@ -46,10 +49,8 @@ import de.hfu.vbank.GetCreditRate;
 @IntegrationComponentScan
 @EnableAutoConfiguration
 public class Application {
-	
-	String myPayload1 = "<?xml version=\"1.0\" ?><S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\"><S:Body><ns2:getCreditRate xmlns:ns2=\"http://vbank.hfu.de/\"><arg0>2000.0</arg0><arg1>12</arg1><arg2>a</arg2></ns2:getCreditRate></S:Body></S:Envelope>";
-	String myPayload2 = "<ns2:getCreditRate xmlns:ns2=\"http://vbank.hfu.de/\"><arg0>2000.0</arg0><arg1>12</arg1><arg2>a</arg2></ns2:getCreditRate>";
-	String myPayload3 = "<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\"><S:Body><ns2:getCreditRate xmlns:ns2=\"http://vbank.hfu.de/\"><arg0>2000.0</arg0><arg1>12</arg1><arg2>a</arg2></ns2:getCreditRate></S:Body></S:Envelope>";
+
+	String myPayload = "<ns2:getCreditRate xmlns:ns2=\"http://vbank.hfu.de/\"><arg0>2000.0</arg0><arg1>12</arg1><arg2>a</arg2></ns2:getCreditRate>";
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext ctx = SpringApplication.run(
@@ -61,16 +62,15 @@ public class Application {
 		getCreditRate.setArg1(5);
 		getCreditRate.setArg2("a");
 
-		System.out.println(converter.fahrenheitToCelcius(getCreditRate));
+		System.out.println("Result: "
+				+ converter.fahrenheitToCelcius(getCreditRate));
 		ctx.close();
 	}
 
 	@MessagingGateway
 	public interface TempConverter {
-
 		@Gateway(requestChannel = "requestChannel")
-		float fahrenheitToCelcius(GetCreditRate getCreditRate);
-
+		double fahrenheitToCelcius(GetCreditRate getCreditRate);
 	}
 
 	@Bean
@@ -111,17 +111,15 @@ public class Application {
 	public SimpleWebServiceOutboundGateway webserviceGate() {
 		SimpleWebServiceOutboundGateway simpleWebServiceOutboundGateway = new SimpleWebServiceOutboundGateway(
 				wsdl11DestinationProvider());
-		simpleWebServiceOutboundGateway.setHeaderMapper(new DefaultSoapHeaderMapper());
-
-		// simpleWebServiceOutboundGateway.setOutputChannel(requestChannel());
+		simpleWebServiceOutboundGateway
+				.setHeaderMapper(new DefaultSoapHeaderMapper());
 		return simpleWebServiceOutboundGateway;
 	}
 
 	@Bean
 	public IntegrationFlow convert() {
-		return IntegrationFlows
-				.from("requestChannel")
-				.transform(payload -> myPayload2)
-				.handle(webserviceGate()).get();
+		return IntegrationFlows.from("requestChannel")
+				.transform(payload -> myPayload).handle(webserviceGate())
+				.transform(Transformers.xpath("//return/text()")).get();
 	}
 }
