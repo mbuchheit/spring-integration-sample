@@ -17,7 +17,6 @@ package simple.flow;
  */
 
 import java.util.Map;
-import java.util.Date;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -46,17 +45,10 @@ public class Application {
 	public static void main(String[] args) throws Exception {
 		ConfigurableApplicationContext ctx = SpringApplication.run(
 				Application.class, args);
-		System.out.println(ctx.getBean(Gate.class)
-				.sendReceive("enrichtMessage"));
 	}
 
 	@MessagingGateway(defaultRequestChannel = "requestChannel")
 	public interface Gateway {
-		String sendReceive(String in);
-	}
-
-	@MessagingGateway(defaultRequestChannel = "enrichFlow")
-	public interface Gate {
 		String sendReceive(String in);
 	}
 
@@ -86,40 +78,22 @@ public class Application {
 					@Override
 					public Object handle(Message payload,
 							Map<String, Object> headers) {
-						System.out.println(payload.getPayload().getClass()
-								+ " " + payload.getPayload());
+						System.out.println("After Enricher "
+								+ payload.getPayload());
 						return payload;
 					}
 
-				})
-				.enrich(e -> e.header("date123", "Enricht Header"))
+				}).enrich(e -> e.header("HeaderKey", "Enricht Header"))
 				.handle(new GenericHandler<Message>() {
 					@Override
 					public Object handle(Message payload,
 							Map<String, Object> headers) {
-						System.out.println(payload.getPayload().getClass()
-								+ " " + payload.getPayload());
-						System.out.println("headers.get(date)" +headers.get("date123"));
-						return payload;
-					}
-
-				}).get();
-	}
-
-	@Bean
-	public IntegrationFlow errorFlow() {
-		return IntegrationFlows.from("enrichFlow")
-				.handle(new GenericHandler<Message>() {
-					@Override
-					public Object handle(Message payload,
-							Map<String, Object> headers) {
-						System.out.println(payload.getPayload().getClass()
-								+ " " + payload.getPayload());
+						System.out.println("Before Enricher "
+								+ payload.getPayload() + " HeaderValue: "
+								+ headers.get("HeaderKey"));
 						return payload;
 					}
 				}).get();
 	}
-
-	
 
 }

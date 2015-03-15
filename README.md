@@ -24,3 +24,9 @@ https://code.google.com/p/rest-client/downloads/list
 http://code.fosshub.com/WizToolsorg-RESTClient/downloads
 
 Die Daten die dem ESB gesendet werden, werden je nach Beispiel von verschiedenen Patterns verarbeitet und auf der Console ausgegeben.
+
+##Weitere Beispiele
+
+- http://spring.io/blog/2014/11/25/spring-integration-java-dsl-line-by-line-tutorial
+- https://spring.io/blog/2014/10/31/spring-integration-java-dsl-1-0-rc1-released
+- https://github.com/spring-projects/spring-integration-java-dsl/wiki/Spring-Integration-Java-DSL-Reference

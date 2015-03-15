@@ -27,27 +27,6 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jaxb2-maven-plugin</artifactId>
-				<version>1.4</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>xjc</goal>
-						</goals>
-						<phase>generate-sources</phase>
-					</execution>
-				</executions>
-				<configuration>
-					<clearOutputDir>false</clearOutputDir>
-					<outputDirectory>src/main/java</outputDirectory>
-					<schemaDirectory>src/main/webapp/schemas</schemaDirectory>
-					<includeSchema>**/*.xsd</includeSchema>
-					<enableIntrospection>false</enableIntrospection>
-				</configuration>
-			</plugin>
-
 		</plugins>
 	</build>
 
@@ -81,6 +60,11 @@
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-ws</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-cypher-compiler-2.1</artifactId>
+			<version>2.1.5</version>
 		</dependency>
 	</dependencies>
 
