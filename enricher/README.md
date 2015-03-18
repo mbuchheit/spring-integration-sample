@@ -1,4 +1,4 @@
-# REST JSON
+# ENRICHER
 
 
 ## Funktionsweise der Anwendung
@@ -15,6 +15,7 @@ Die JSON Nachricht sollte als HTTP POST im Body verschickt werden und folgendes 
 { "id":1, "email":"Test@Test.de", "username":"Test", "password":"Test", "firstname":"TestVorname", "lastname":"TestNachname" }
 
 Dadurch kann das JSON Objekt auf das Java Objekt rest.json.User abgebildet werden. 
+Nach der ersten Ausgabe des Payloads, wird eine Header statische Header Variable gesetzt.
 
 
 

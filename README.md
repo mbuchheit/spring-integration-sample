@@ -17,7 +17,7 @@ Da die Beispiele bezüglich Umfang aufeinander Aufbauen wird im folgenden eine R
 
 ## Testen der Beispiele
 
-Die Anwendungen nehmen Daten im JSON Format über eine HTTP Adresse entgegen.
+Die Anwendungen nehmen Daten im JSON Format über eine HTTP Adresse entgegen, der ESB bzw. der Server der für den ESB gestartet wird verwendet Standardmäßig den Port 8080.
 Es wird ein REST Client benötigt:
 http://restclient.net/
 https://code.google.com/p/rest-client/downloads/list
@@ -30,3 +30,4 @@ Die Daten die dem ESB gesendet werden, werden je nach Beispiel von verschiedenen
 - http://spring.io/blog/2014/11/25/spring-integration-java-dsl-line-by-line-tutorial
 - https://spring.io/blog/2014/10/31/spring-integration-java-dsl-1-0-rc1-released
 - https://github.com/spring-projects/spring-integration-java-dsl/wiki/Spring-Integration-Java-DSL-Reference
+- https://spring.io/blog/2014/06/18/spring-integration-java-dsl-milestone-2-released
